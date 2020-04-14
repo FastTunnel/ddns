@@ -2,22 +2,63 @@
 using Aliyun.Acs.Core;
 using Aliyun.Acs.Core.Exceptions;
 using Aliyun.Acs.Core.Profile;
+using DDNS.Api.Helper;
+using DDNS.Api.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DDNS.Api
 {
-    public class Aliyun : IDomainRecord
+    public class AliyunDomainRecord : IDomainRecord
     {
-        public void dd()
+        private string accessKey;
+        private string accessSecret;
+
+        public AliyunDomainRecord(string accessKey, string accessSecret)
         {
-            IClientProfile profile = DefaultProfile.GetProfile("cn-hangzhou", "<accessKeyId>", "<accessSecret>");
+            this.accessKey = accessKey;
+            this.accessSecret = accessSecret;
+        }
+
+        public IEnumerable<DescribeRecord> GetRecords(string domainName)
+        {
+            IClientProfile profile = DefaultProfile.GetProfile("cn-hangzhou", accessKey, accessSecret);
             DefaultAcsClient client = new DefaultAcsClient(profile);
 
-            var request = new AddDomainRecordRequest();
+            var request = new DescribeDomainRecordsRequest();
+            request.DomainName = domainName;
+            request.TypeKeyWord = "A";
+
+            var response = client.GetAcsResponse(request);
+            if (response.TotalCount == 0)
+            {
+                throw new Exception("请先手动解析几条A记录");
+            }
+
+            return response.DomainRecords.Select(x => new DescribeRecord()
+            {
+                RecordId = x.RecordId,
+                Value = x.Value,
+                RR = x.RR,
+                Type = x.Type,
+            });
+        }
+
+
+        public void UpdateRecord(DescribeRecord record)
+        {
+            IClientProfile profile = DefaultProfile.GetProfile("cn-hangzhou", accessKey, accessSecret);
+            DefaultAcsClient client = new DefaultAcsClient(profile);
+
+            var request = new UpdateDomainRecordRequest();
+            request.RecordId = record.RecordId;
+            request.RR = record.RR;
+            request.Type = record.Type;
+            request.Value = record.Value;
             try
             {
                 var response = client.GetAcsResponse(request);
-                Console.WriteLine(System.Text.Encoding.Default.GetString(response.HttpResponse.Content));
             }
             catch (ServerException e)
             {
