@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aliyun.Acs.Alidns" Version="1.0.1" />
+    <PackageReference Include="Aliyun.Acs.Core" Version="1.0.1" />
+  </ItemGroup>
+
+</Project>
