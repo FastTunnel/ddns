@@ -15,10 +15,10 @@ namespace DDNS.Api
         private string accessKey;
         private string accessSecret;
 
-        public AliyunDomainRecord(string accessKey, string accessSecret)
+        public AliyunDomainRecord(DDNSConfig config)
         {
-            this.accessKey = accessKey;
-            this.accessSecret = accessSecret;
+            this.accessKey = config.accessKey;
+            this.accessSecret = config.accessSecret;
         }
 
         public IEnumerable<DescribeRecord> GetRecords(string domainName)
