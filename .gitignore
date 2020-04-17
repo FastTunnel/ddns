@@ -2,3 +2,6 @@
 /src/DDNS/bin
 /src/DDNS.Api/bin
 /src/DDNS.Api/obj
+/src/.vs
+/src/DDNS/*.user
+/src/DDNS/Properties/PublishProfiles/*.user
