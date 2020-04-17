@@ -1,8 +1,16 @@
 ﻿using DDNS.Api;
 using DDNS.Api.Helper;
+using FastTunnel.Client;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DDNS
 {
@@ -10,19 +18,22 @@ namespace DDNS
     {
         static void Main(string[] args)
         {
-            string api = "aliyun";
-            string accessKey = "LTAI4FttR8xEbARtfW1CZRk2";
-            string accessSecret = "a3drBv41y9fCwdZAsGjPaMb9mNsVU4";
-            string domain = "ioxygen.cc";
+            var conf = new ConfigurationBuilder()
+             .SetBasePath(Directory.GetCurrentDirectory())
+             .AddJsonFile("appsettings.json", true, true)
+             .Build();
+
+            var settings = conf.Get<Appsettings>();
+            var dnsConfig = settings.DDNS;
 
             IDomainRecord domainRecord;
-            switch (api)
+            switch (dnsConfig.openPlat)
             {
                 case "aliyun":
-                    domainRecord = new AliyunDomainRecord(accessKey, accessSecret);
+                    domainRecord = new AliyunDomainRecord(dnsConfig);
                     break;
                 default:
-                    Console.WriteLine($"不支持的开放平台 {api}");
+                    Console.WriteLine($"不支持的开放平台 {dnsConfig.openPlat}");
                     return;
             }
 
@@ -30,14 +41,14 @@ namespace DDNS
             {
                 try
                 {
-                    Refresh(domainRecord, domain);
+                    Refresh(domainRecord, dnsConfig.domain);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
 
-                Thread.Sleep(60 * 1000); // 1分钟检查一次
+                Thread.Sleep(60 * 1000 * 10); // 1分钟检查一次
             }
         }
 
