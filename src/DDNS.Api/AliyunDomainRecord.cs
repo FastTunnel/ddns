@@ -45,7 +45,6 @@ namespace DDNS.Api
             });
         }
 
-
         public void UpdateRecord(DescribeRecord record)
         {
             IClientProfile profile = DefaultProfile.GetProfile("cn-hangzhou", accessKey, accessSecret);

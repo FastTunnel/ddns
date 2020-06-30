@@ -13,5 +13,7 @@ namespace DDNS.Api.Models
         public string accessSecret { get; set; }
 
         public string domain { get; set; }
+
+        public string ignoreRR { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DDNS.Api;
 using DDNS.Api.Helper;
+using DDNS.Api.Models;
 using FastTunnel.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,7 +42,7 @@ namespace DDNS
             {
                 try
                 {
-                    Refresh(domainRecord, dnsConfig.domain);
+                    Refresh(domainRecord, dnsConfig);
                 }
                 catch (Exception ex)
                 {
@@ -52,11 +53,17 @@ namespace DDNS
             }
         }
 
-        public static void Refresh(IDomainRecord domainRecord, string domain)
+        public static void Refresh(IDomainRecord domainRecord, DDNSConfig dnsConfig)
         {
             var current_ip = IPHelper.CurrentIp();
-            var records = domainRecord.GetRecords(domain);
-            if (current_ip == records.First().Value)
+            var records = domainRecord.GetRecords(dnsConfig.domain);
+            if (!string.IsNullOrEmpty(dnsConfig.ignoreRR.Trim()))
+            {
+                var igs = dnsConfig.ignoreRR.Trim().Split("|");
+                records = records.Where(x => x.Type == "A" && !igs.Contains(x.RR));
+            }
+
+            if (!records.Any(x => x.Value != current_ip))
             {
                 Console.WriteLine($"{DateTime.Now} ip没有改变 {current_ip}");
                 return;
