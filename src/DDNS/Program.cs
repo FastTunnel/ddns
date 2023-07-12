@@ -57,10 +57,18 @@ namespace DDNS
         {
             var current_ip = IPHelper.CurrentIp();
             var records = domainRecord.GetRecords(dnsConfig.domain);
-            if (!string.IsNullOrEmpty(dnsConfig.ignoreRR.Trim()))
+            if (string.IsNullOrEmpty(dnsConfig.RR.Trim()))
             {
-                var igs = dnsConfig.ignoreRR.Trim().Split("|");
-                records = records.Where(x => x.Type == "A" && !igs.Contains(x.RR));
+                if (!string.IsNullOrEmpty(dnsConfig.ignoreRR.Trim()))
+                {
+                    var igs = dnsConfig.ignoreRR.Trim().Split("|");
+                    records = records.Where(x => x.Type == "A" && !igs.Contains(x.RR));
+                }
+            }
+            else
+            {
+                var rs = dnsConfig.RR.Trim().Split("|");
+                records = records.Where(x => x.Type == "A" && rs.Contains(x.RR));
             }
 
             if (!records.Any(x => x.Value != current_ip))

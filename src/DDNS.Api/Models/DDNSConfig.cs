@@ -14,6 +14,8 @@ namespace DDNS.Api.Models
 
         public string domain { get; set; }
 
+        public string RR { get; set; }
+
         public string ignoreRR { get; set; }
     }
 }
